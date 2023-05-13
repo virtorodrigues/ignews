@@ -1,8 +1,9 @@
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
-import { RichText } from "prismic-dom";
+import * as RichText from "@prismicio/richtext";
 import Head from "next/head";
 import { getPrismicClient } from "../../services/prismic";
+import * as prismicH from "@prismicio/helpers";
 
 import styles from "./post.module.scss";
 import { ParsedUrlQuery } from "querystring";
@@ -41,7 +42,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   params,
 }) => {
-  const { session } = await getSession({ req });
+  const { session } = (await getSession({ req })) as any;
 
   const { slug } = params as ParsedUrlQuery;
 
@@ -59,12 +60,12 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const prismic = getPrismicClient(req);
 
-  const response = await prismic.getByUID("post", String(slug), {});
+  const response = (await prismic.getByUID("post", String(slug), {})) as any;
 
   const post = {
     slug,
-    title: RichText?.asText(response?.data.title),
-    content: RichText?.asHtml(response?.data.content),
+    title: prismicH?.asText(response?.data.title),
+    content: prismicH?.asHTML(response?.data.content),
     updatedAt: new Date(response?.last_publication_date).toLocaleDateString(
       "pt-BR",
       {

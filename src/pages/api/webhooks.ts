@@ -28,11 +28,9 @@ const relevantsEvents = new Set([
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  console.log("*********************************STRIPE*********************");
-
   if (req.method === "POST") {
     const buf = await buffer(req);
-    const secret = req.headers["stripe-signature"];
+    const secret = req.headers["stripe-signature"] || "";
 
     let event: Stripe.Event;
 
@@ -40,16 +38,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       event = stripe.webhooks.constructEvent(
         buf,
         secret,
-        process.env.STRIPE_WEBHOOK_SECRET
+        process.env.STRIPE_WEBHOOK_SECRET || ""
       );
-    } catch (err) {
+    } catch (err: any) {
       return res.status(400).send(`Webhook error: ${err.message}`);
     }
 
     const { type } = event;
-    console.log("*********************************STRIPE*********************");
-    console.log(type);
-    console.log("*********************************STRIPE*********************");
 
     if (relevantsEvents.has(type)) {
       try {
@@ -70,8 +65,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             const checkoutSession = event.data
               .object as Stripe.Checkout.Session;
             await saveSubscription(
-              checkoutSession.subscription.toString(),
-              checkoutSession.customer.toString(),
+              String(checkoutSession.subscription),
+              String(checkoutSession.customer),
               true
             );
             break;

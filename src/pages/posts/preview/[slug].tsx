@@ -1,6 +1,6 @@
 import { GetStaticProps } from "next";
 import { getSession, useSession } from "next-auth/react";
-import { RichText } from "prismic-dom";
+import * as RichText from "@prismicio/richtext";
 import Head from "next/head";
 import { getPrismicClient } from "../../../services/prismic";
 import Link from "next/link";
@@ -8,6 +8,8 @@ import Link from "next/link";
 import styles from "../post.module.scss";
 import { useEffect } from "react";
 import { useRouter } from "next/dist/client/router";
+import { ParsedUrlQuery } from "querystring";
+import * as prismicH from "@prismicio/helpers";
 
 interface PostPreviewProps {
   post: {
@@ -22,13 +24,14 @@ export default function PostPreview({ post }: PostPreviewProps) {
   const { data, status, update } = useSession();
   const router = useRouter();
 
-  useEffect(() => {
-    console.log(data);
+  // useEffect(() => {
+  //   console.log("dasdasdassssss dasd as ddas das ");
+  //   console.log(data, status);
 
-    // if (session?.activeSubscription) {
-    //   router.push(`/posts/${post.slug}`);
-    // }
-  }, [status, data]);
+  //   if (session?.activeSubscription) {
+  //     router.push(`/posts/${post.slug}`);
+  //   }
+  // }, [status, data]);
 
   return (
     <>
@@ -63,21 +66,24 @@ export const getStaticPaths = () => {
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const { slug } = params;
+  const { slug } = params as ParsedUrlQuery;
 
   const prismic = getPrismicClient();
 
-  const response = await prismic.getByUID("post", String(slug), {});
+  const response = (await prismic.getByUID("post", String(slug), {})) as any;
 
   const post = {
     slug,
-    title: "asdasdasd",
-    content: "dasfggfdgdf",
-    updatedAt: new Date().toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    }),
+    title: prismicH?.asText(response?.data.title),
+    content: prismicH?.asHTML(response?.data.content.splice(0, 3)),
+    updatedAt: new Date(response?.last_publication_date).toLocaleDateString(
+      "pt-BR",
+      {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      }
+    ),
   };
 
   return {

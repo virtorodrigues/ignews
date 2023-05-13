@@ -7,12 +7,6 @@ export async function saveSubscription(
   customerId: string,
   createAction: boolean
 ) {
-  console.log(
-    "************************** manageSubscription*********************"
-  );
-  console.log(
-    "************************** manageSubscription*********************"
-  );
   const userRef = await fauna.query(
     q.Select(
       "ref",

@@ -1,9 +1,10 @@
-import { GetServerSideProps, GetStaticProps } from "next";
+import { GetStaticProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { getPrismicClient } from "../../services/prismic";
 import Prismic from "@prismicio/client";
-import { RichText } from "prismic-dom";
+import * as RichText from "@prismicio/richtext";
+import * as prismicH from "@prismicio/helpers";
 
 import styles from "./styles.module.scss";
 import { getSession } from "next-auth/react";
@@ -50,7 +51,7 @@ export default function Posts({ posts, session }: PostsProps) {
   );
 }
 
-export const getStaticProps: GetServerSideProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
   const prismic = getPrismicClient();
   const session = await getSession();
 
@@ -62,16 +63,21 @@ export const getStaticProps: GetServerSideProps = async () => {
     }
   );
 
-  const posts = response.results?.map((post) => {
+  const posts = response.results?.map((post: any) => {
     return {
       slug: post.uid,
-      title: "dasd",
-      exerpt: "dasda",
-      updatedAt: new Date().toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      }),
+      title: prismicH.asText(post.data.title),
+      exerpt:
+        post.data.content.find((content: any) => content.type === "paragraph")
+          ?.text ?? "",
+      updatedAt: new Date(post.last_publication_date).toLocaleDateString(
+        "pt-BR",
+        {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        }
+      ),
     };
   });
 

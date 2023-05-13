@@ -3,6 +3,7 @@ import { getSession } from "next-auth/react";
 import { fauna } from "../../services/fauna";
 import { stripe } from "../../services/stripe";
 import { query as q } from "faunadb";
+import { Session } from "next-auth";
 
 type User = {
   ref: {
@@ -16,7 +17,9 @@ type User = {
 /* eslint import/no-anonymous-default-export: [2, {"allowArrowFunction": true}] */
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
-    const { session } = await getSession({ req });
+    const { session } = (await getSession({ req })) as any;
+
+    const email = session?.user.email || "";
 
     const user = await fauna.query<User>(
       q.Get(q.Match(q.Index("user_by_email"), q.Casefold(session.user.email)))
