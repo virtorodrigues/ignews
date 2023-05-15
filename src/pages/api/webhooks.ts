@@ -31,18 +31,14 @@ const relevantsEvents = new Set([
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     const buf = await buffer(req);
-    const secret = req.headers["stripe-signature"] || "";
-
+    const secret = req.headers["stripe-signature"] as string;
+    const webhookSecrete = process.env.STRIPE_WEBHOOK_SECRET as string;
     let event: Stripe.Event;
 
     try {
       //const rawBody = await getRawBody(req);
 
-      event = stripe.webhooks.constructEvent(
-        req.body,
-        secret,
-        process.env.STRIPE_WEBHOOK_SECRET || ""
-      );
+      event = stripe.webhooks.constructEvent(buf, secret, webhookSecrete);
     } catch (err: any) {
       return res
         .status(400)
