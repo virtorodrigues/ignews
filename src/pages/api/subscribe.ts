@@ -17,9 +17,7 @@ type User = {
 /* eslint import/no-anonymous-default-export: [2, {"allowArrowFunction": true}] */
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
-    const { data: session } = (await getSession({ req })) as any;
-
-    const email = session?.user.email || "";
+    const session = (await getSession({ req })) as any;
 
     const user = await fauna.query<User>(
       q.Get(q.Match(q.Index("user_by_email"), q.Casefold(session.user.email)))
