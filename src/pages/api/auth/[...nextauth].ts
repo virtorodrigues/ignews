@@ -15,8 +15,10 @@ export default NextAuth({
     }),
     // ...add more providers here
   ],
+  secret: process.env.NEXTAUTH_SECRET,
   jwt: {
     //signingKey: process.env.JWT_SIGNING_PRIVATE_KEY || "",
+    secret: process.env.JWT_SIGNING_PRIVATE_KEY,
     maxAge: 60 * 60 * 24 * 7, // a week
   },
   callbacks: {
