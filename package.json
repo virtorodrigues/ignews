@@ -23,6 +23,7 @@
     "next": "13.4.2",
     "next-auth": "4.22.1",
     "prismic-dom": "^2.2.6",
+    "raw-body": "^2.5.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.3.1",
