@@ -41,14 +41,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       event = stripe.webhooks.constructEvent(
         rawBody,
         secret,
-        process.env.STRIPE_WEBHOOK_SECRET || ""
+        process.env.STRIPE_API_KEY || ""
       );
     } catch (err: any) {
       return res
         .status(400)
-        .send(
-          `Webhook error: ${process.env.STRIPE_WEBHOOK_SECRET} ${err.message}`
-        );
+        .send(`Webhook error: ${process.env.STRIPE_API_KEY} ${err.message}`);
     }
 
     const { type } = event;
