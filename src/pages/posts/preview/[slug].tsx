@@ -21,17 +21,14 @@ interface PostPreviewProps {
 }
 
 export default function PostPreview({ post }: PostPreviewProps) {
-  const { data, status, update } = useSession();
+  const { data: session, status, update } = useSession() as any;
   const router = useRouter();
 
-  // useEffect(() => {
-  //   console.log("dasdasdassssss dasd as ddas das ");
-  //   console.log(data, status);
-
-  //   if (session?.activeSubscription) {
-  //     router.push(`/posts/${post.slug}`);
-  //   }
-  // }, [status, data]);
+  useEffect(() => {
+    if (session?.activeSubscription) {
+      router.push(`/posts/${post.slug}`);
+    }
+  }, [session, post, router]);
 
   return (
     <>

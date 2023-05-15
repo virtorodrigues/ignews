@@ -42,7 +42,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   req,
   params,
 }) => {
-  const { session } = (await getSession({ req })) as any;
+  const session = (await getSession({ req })) as any;
 
   const { slug } = params as ParsedUrlQuery;
 

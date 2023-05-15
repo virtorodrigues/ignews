@@ -22,7 +22,7 @@ export default NextAuth({
     maxAge: 60 * 60 * 24 * 7, // a week
   },
   callbacks: {
-    async session(session: any) {
+    async session({ session }: any) {
       try {
         const userActiveSubscription = await fauna.query(
           q.Get(

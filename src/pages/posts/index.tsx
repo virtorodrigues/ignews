@@ -1,4 +1,4 @@
-import { GetStaticProps } from "next";
+import { GetServerSideProps, GetStaticProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { getPrismicClient } from "../../services/prismic";
@@ -16,14 +16,7 @@ interface Post {
   updatedAt: string;
 }
 
-interface PostsProps {
-  posts: Post[];
-  session: {
-    activeSubscribe: boolean;
-  };
-}
-
-export default function Posts({ posts, session }: PostsProps) {
+export default function Posts({ posts, activeSubscription }: any) {
   return (
     <>
       <Head>
@@ -31,11 +24,11 @@ export default function Posts({ posts, session }: PostsProps) {
       </Head>
       <main className={styles.container}>
         <div className={styles.posts}>
-          {posts?.map((post) => (
+          {posts?.map((post: any) => (
             <Link
               key={post.slug}
               href={
-                session?.activeSubscribe
+                !!activeSubscription
                   ? `/posts/${post.slug}`
                   : `/posts/preview/${post.slug}`
               }
@@ -51,9 +44,9 @@ export default function Posts({ posts, session }: PostsProps) {
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const prismic = getPrismicClient();
-  const session = await getSession();
+  const session = (await getSession({ req })) as any;
 
   const response = await prismic.query(
     [Prismic.predicates.at("document.type", "post")],
@@ -82,6 +75,6 @@ export const getStaticProps: GetStaticProps = async () => {
   });
 
   return {
-    props: { posts, session },
+    props: { posts, activeSubscription: session?.activeSubscription || null },
   };
 };

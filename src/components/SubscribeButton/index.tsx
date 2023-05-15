@@ -13,7 +13,7 @@ interface SubscribeButtonProps {
 //API routes
 
 export function SubscribeButton({ priceId }: SubscribeButtonProps) {
-  const { data: session } = useSession();
+  const { data: session } = useSession() as any;
   const router = useRouter();
 
   async function handleSubscrible() {
@@ -23,10 +23,10 @@ export function SubscribeButton({ priceId }: SubscribeButtonProps) {
       return;
     }
 
-    // if (session?.activeSubscription) {
-    //   router.push("/posts");
-    //   return;
-    // }
+    if (session?.activeSubscription) {
+      router.push("/posts");
+      return;
+    }
 
     //chekout
     try {
