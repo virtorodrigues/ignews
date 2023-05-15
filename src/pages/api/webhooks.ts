@@ -29,14 +29,16 @@ const relevantsEvents = new Set([
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
-    const buf = await buffer(req);
+    // const buf = await buffer(req);
     const secret = req.headers["stripe-signature"] || "";
 
     let event: Stripe.Event;
 
     try {
+      const stripePayload = (req as any).rawBody || req.body;
+
       event = stripe.webhooks.constructEvent(
-        buf,
+        stripePayload,
         secret,
         process.env.STRIPE_WEBHOOK_SECRET || ""
       );
